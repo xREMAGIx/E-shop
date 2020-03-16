@@ -1,7 +1,10 @@
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
+const fileupload = require("express-fileupload");
+const cookieParser = require("cookie-parser");
 const errorHandler = require("./middlewares/error");
 const colors = require("colors");
 
@@ -13,22 +16,35 @@ connectDB();
 
 // Route files
 const products = require("./routes/products");
+const auth = require("./routes/auth");
+const cart = require("./routes/cart");
 
 const app = express();
 
 // Body parser
 app.use(express.json());
 
+// Cookie parser
+app.use(cookieParser());
+
 // Dev loggin middleware
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+// File uploading
+app.use(fileupload());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, "public")));
+
 // Moute routers
 app.use("/api/products", products);
+app.use("/api/auth", auth);
+app.use("/api/cart", cart);
 
 app.get("/", (req, res) => {
-  res.send("Hello");
+  res.send("Helslo");
 });
 
 app.use(errorHandler);
