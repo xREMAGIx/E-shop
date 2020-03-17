@@ -65,6 +65,11 @@ const UserSchema = new mongoose.Schema({
         image: {
           type: String,
           default: "no-image.jpg"
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now(),
+          expire: "1m"
         }
       }
     ]
