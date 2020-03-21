@@ -165,21 +165,27 @@ exports.deleteCart = asyncHandler(async (req, res, next) => {
 // @route Put /api/cart/
 // @access  Private
 exports.checkOutCart = asyncHandler(async (req, res, next) => {
-  let cart = req.session.cart;
+  let cart = await Cart.findOne({ user: req.user.id });
 
+  cart = JSON.parse(JSON.stringify(cart));
   let productIds = [];
   let amount = {};
   cart.products.map(product => {
-    productIds.push(product.productId);
-    amount[product.productId] = product.amount;
+    productIds.push(product.product);
+    amount[product.product] = product.amount;
   });
+
+  console.log(productIds);
+  console.log(amount);
 
   const products = await Product.find({ _id: { $in: productIds } });
 
   // Create hash amount
   let total = 0;
-
-  products.map(product => (total += amount[product._id] * product.price));
+  products.map(product => {
+    console.log(total);
+    total += amount[product._id] * product.price;
+  });
   cart.products = [];
 
   await Cart.findOneAndUpdate(
