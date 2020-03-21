@@ -5,7 +5,8 @@ const {
   getMe,
   forgotPassword,
   resetPassword,
-  confirmEmail
+  confirmEmail,
+  activeAccount
 } = require("../controllers/auth");
 const { protect } = require("../middlewares/auth");
 
@@ -17,5 +18,6 @@ router.get("/me", protect, getMe);
 router.post("/forgotpassword", forgotPassword);
 router.put("/resetpassword/:resettoken", resetPassword);
 router.get("/confirm-email/:confirmToken", confirmEmail);
+router.post("/authentication", activeAccount);
 
 module.exports = router;

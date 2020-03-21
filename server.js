@@ -7,6 +7,7 @@ const fileupload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const errorHandler = require("./middlewares/error");
 const colors = require("colors");
+const session = require("express-session");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -20,6 +21,17 @@ const auth = require("./routes/auth");
 const cart = require("./routes/cart");
 
 const app = express();
+
+// Session
+
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 * 1000 }
+  })
+);
 
 // Body parser
 app.use(express.json());

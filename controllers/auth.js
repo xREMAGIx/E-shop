@@ -2,12 +2,17 @@ const crypto = require("crypto");
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/User");
+const Cart = require("../models/Cart");
+const Product = require("../models/Product");
 const sendEmail = require("../utils/sendEmail");
+
 // @des Register User
 // @route POST /api/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
+  console.log(1);
   const user = await User.create(req.body);
+  console.log(2);
 
   // Get confirm token
   const confirmToken = user.getConfirmEmailToken();
@@ -87,6 +92,13 @@ exports.login = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // Set cart session
+  let cart = await Cart.findOne({ user: user._id });
+  if (!cart) cart = await Cart.create({ user: user._id });
+  req.session.cart = cart;
+
+  console.log("req.session.cart ", cart);
+
   sendTokenResponse(user, 200, res);
 });
 
@@ -148,7 +160,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     "host"
   )}/api/auth/resetpassword/${resetToken}`;
 
-  const message = `Click on the link below to reset password: \n\n ${resetUrl}`;
+  const message = `Click on the link below to reset password to 123456: \n\n ${resetUrl}`;
 
   try {
     await sendEmail({ email: user.email, subject: "RESET PASSWORD", message });
@@ -158,6 +170,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     console.log(error);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
+    user.password = 123456;
 
     await user.save({ validateBeforeSave: false });
 
@@ -166,13 +179,13 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 });
 
 // @des Get confirm Email token
-// @route POST /api/auth/authenication
+// @route POST /api/auth/authenication/:email
 // @access  Public
 exports.activeAccount = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    return next(new ErrorResponse("There os no user with that email", 404));
+    return next(new ErrorResponse("There is no user with that email", 404));
   }
 
   // Get reset token

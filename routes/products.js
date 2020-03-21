@@ -15,7 +15,7 @@ const router = express.Router();
 router
   .route("/")
   .get(getProducts)
-  .post(protect, createProduct);
+  .post(protect, roleProtect("admin"), createProduct);
 
 router
   .route("/:id")
@@ -27,4 +27,5 @@ router
   .route("/:id/image")
   .put(protect, roleProtect("admin"), productImageUpload)
   .post(protect, roleProtect("admin"), productImageUpload);
+
 module.exports = router;

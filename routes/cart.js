@@ -5,10 +5,11 @@ const {
   decreaseCart,
   deleteCart,
   DeleteItemFromCart,
-  checkOutCart
+  checkOutCart,
+  saveCart
 } = require("../controllers/cart");
 
-const { protect, roleProtect } = require("../middlewares/auth");
+const { protect } = require("../middlewares/auth");
 
 const router = express.Router();
 
@@ -16,7 +17,9 @@ router
   .route("/")
   .get(protect, viewCart)
   .delete(protect, deleteCart)
-  .put(protect, checkOutCart);
+  .put(protect, checkOutCart)
+  .post(protect, saveCart);
+
 router
   .route("/:productId")
   .put(protect, addToCart)

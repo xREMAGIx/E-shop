@@ -1,7 +1,6 @@
 const ErrorResponse = require("../utils/errorResponse");
 
 const errorHandler = (err, req, res, next) => {
-  console.log("die me may");
   let error = { ...err };
 
   error.message = err.message;
@@ -16,6 +15,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Mongoose dupplicate key
   if (err.code === 11000) {
+    console.log(err);
     const message = "Duplicate field value";
     error = new ErrorResponse(message, 400);
   }

@@ -2,15 +2,29 @@ const crypto = require("crypto");
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/User");
+const Cart = require("../models/Cart");
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
 
 // @des View Cart
 // @route GET /api/cart/
 // @access  Private
-exports.viewCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
 
-  const cart = user.cart;
+const createCart = async user => {
+  let cart = await Cart.findOne({ user: user });
+  if (!cart) cart = Cart.create({ user: user });
+  return cart;
+};
+exports.viewCart = asyncHandler(async (req, res, next) => {
+  console.log("userID: ", req.user.id);
+  let cart = req.session.cart;
+
+  if (!cart) cart = await createCart(req.user);
+
+  await Cart.findOneAndUpdate(
+    { user: req.user.id },
+    { products: cart.products }
+  );
 
   return res.status(200).json({ success: true, data: cart });
 });
@@ -19,41 +33,47 @@ exports.viewCart = asyncHandler(async (req, res, next) => {
 // @route PUT /api/cart/:productId
 // @access  Private
 exports.addToCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  let cart = user.cart;
+  console.log("User' cart: ", req.session.cart);
+  let cart = req.session.cart;
+
+  if (!cart) cart = await createCart(req.user);
+
+  console.log(cart);
 
   const productId = req.params.productId;
   let exits = false;
 
   cart.products.map(product => {
-    if (product.productId.equals(productId)) {
+    console.log(product._id);
+    if (product.product === productId) {
       product.amount++;
       exits = true;
       return;
     }
   });
 
-  if (exits == false) {
+  if (exits === false) {
     const product = await Product.findById(productId);
+
+    console.log("Add to cart");
+    console.log(cart.products);
 
     if (!product) return next(new ErrorResponse("Product not found", 404));
 
-    const { sku, productName, category, price, discount, image } = product;
-    cart.products.push({
-      productId,
-      amount: 1,
-      sku,
-      productName,
-      category,
-      price,
-      discount,
-      image
+    req.session.cart = cart;
+
+    req.session.cart.products.push({
+      product: productId,
+      amount: 1
     });
+
+    console.log(cart.products);
+    console.log("ahihi");
   }
 
-  user.cart = cart;
+  cart.createdAt = Date.now();
 
-  await user.save();
+  req.session.cart = cart;
 
   return res.status(200).json({ success: true, data: cart });
 });
@@ -62,21 +82,34 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
 // @route Patch /api/cart/:productId
 // @access  Private
 exports.decreaseCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  let cart = user.cart;
+  let cart = req.session.cart;
+
+  if (!cart) cart = await createCart(req.user);
+
+  cart = JSON.parse(JSON.stringify(cart));
 
   const productId = req.params.productId;
 
   cart.products.map(product => {
-    if (product.productId.equals(productId)) {
+    if (product.product === productId && product.amount >= 1) {
       product.amount--;
       return;
     }
   });
-  cart = cart.products.filter(product => product.amount > 0);
-  user.cart = cart;
 
-  await user.save();
+  let products = cart.products;
+
+  products = products.filter(a => a.amount > 0);
+
+  cart.products = cart.products.filter(product => {
+    console.log(product.amount > 0);
+    product.amount > 0;
+  });
+
+  cart.products = products;
+  cart.createdAt = Date.now();
+
+  req.session.cart = cart;
 
   return res.status(200).json({ success: true, data: cart });
 });
@@ -86,59 +119,91 @@ exports.decreaseCart = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.DeleteItemFromCart = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
-  let cart = user.cart;
+  let cart = await Cart.findOne({ user: req.user.id });
 
-  cart = cart.products.filter(
-    product => product.productId != req.params.productId
+  if (!cart) cart = await Cart.create({ user: req.user.id });
+
+  cart = JSON.parse(JSON.stringify(cart));
+
+  products = cart.products;
+
+  console.log(products);
+
+  products = products.filter(
+    product => product.product != req.params.productId
   );
 
-  user.cart = cart;
+  cart.createdAt = Date.now();
 
-  await user.save();
+  await Cart.findOneAndUpdate(
+    { user: req.user.id },
+    { products: products, createdAt: Date.now() }
+  );
 
-  return res.status(200).json({ success: true, data: cart });
+  cart.products = products;
+
+  req.session.cart = cart;
+
+  return res.status(200).json({ success: true, data: req.session.cart });
 });
 
 // @des Delete Cart
 // @route Delete /api/cart/
 // @access  Private
 exports.deleteCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  user.cart = [];
+  let cart = await Cart.findOne({ user: req.user.id });
 
-  await user.save();
+  if (!cart) cart = await Cart.create({ user: req.user.id });
 
-  return res.status(200).json({ success: true, data: user.cart });
-});
+  cart.products = [];
+  await cart.save();
 
-// @des Check out Cart
-// @route Put /api/cart/
-// @access  Private
-exports.deleteCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  cart = user.cart = [];
-
-  await user.save();
-
-  return res.status(200).json({ success: true, data: user.cart });
+  return res.status(200).json({ success: true, data: cart });
 });
 
 // @des Check out Cart
 // @route Put /api/cart/
 // @access  Private
 exports.checkOutCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  let cart = req.session.cart;
 
-  let total = 0;
-
-  user.cart.products.map(product => {
-    total +=
-      product.amount * (product.price - product.price * product.discount);
+  let productIds = [];
+  let amount = {};
+  cart.products.map(product => {
+    productIds.push(product.productId);
+    amount[product.productId] = product.amount;
   });
 
-  user.cart = [];
+  const products = await Product.find({ _id: { $in: productIds } });
 
-  await user.save();
+  // Create hash amount
+  let total = 0;
 
-  return res.status(200).json({ success: true, data: user.cart, total });
+  products.map(product => (total += amount[product._id] * product.price));
+  cart.products = [];
+
+  await Cart.findOneAndUpdate(
+    { user: req.user.id },
+    { products: cart.products }
+  );
+
+  return res.status(200).json({ success: true, data: cart, total });
+});
+
+// @des Save out Cart
+// @route Post /api/cart/
+// @access  Private
+exports.saveCart = asyncHandler(async (req, res, next) => {
+  let cart = req.session.cart;
+
+  if (!cart) {
+    return res.status(200).json({ success: true, data: cart });
+  }
+
+  await Cart.findOneAndUpdate(
+    { user: req.user.id },
+    { products: cart.products }
+  );
+
+  return res.status(200).json({ success: true, data: cart });
 });

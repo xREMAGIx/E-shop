@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -29,6 +30,7 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+
   isAuthentication: {
     type: Boolean,
     default: false
@@ -36,44 +38,6 @@ const UserSchema = new mongoose.Schema({
   authenticationToken: String,
   confirmEmailExpire: Date,
 
-  cart: {
-    products: [
-      {
-        productId: { type: mongoose.Schema.ObjectId, ref: "Product" },
-        amount: Number,
-        sku: {
-          type: String,
-          required: true,
-          unique: true
-        },
-        productName: {
-          type: String,
-          required: true
-        },
-        category: {
-          type: String,
-          required: true
-        },
-        price: {
-          type: Number,
-          required: true
-        },
-        discount: {
-          type: Number,
-          required: true
-        },
-        image: {
-          type: String,
-          default: "no-image.jpg"
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now(),
-          expire: "1m"
-        }
-      }
-    ]
-  },
   createdAt: {
     type: Date,
     default: Date.now
