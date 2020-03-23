@@ -67,8 +67,10 @@ exports.deleteProduct = asyncHandler(async (req, res, next) => {
   // Delete all Image
   const images = await Image.find({ product: product._id });
   // Remove Image
+  console.log(images);
   images.forEach(image => {
-    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image._id}`, function(err) {
+    console.log("image " + image);
+    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image.path}`, function(err) {
       console.log(err);
     });
   });
@@ -111,12 +113,13 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
 
   // Create custom filename
   const image = await Image.create({
-    path: file.name,
     user: req.user.id,
     product: req.params.id
   });
 
   file.name = `photo_${image._id}${path.parse(file.name).ext}`;
+  image.path = file.name;
+  await image.save();
   console.log(file.name);
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
     if (err) {

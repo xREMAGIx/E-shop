@@ -3,12 +3,14 @@ const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/User");
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
+const Image = require("../models/Image");
+const path = require("path");
 
 // @des View all Post
 // @route GET /api/posts/
 // @access  Private
 exports.getPosts = asyncHandler(async (req, res, next) => {
-  const posts = Post.find().populate("Image");
+  const posts = await Post.find().populate("images");
 
   return res.status(200).json({ success: true, data: posts });
 });
@@ -71,4 +73,41 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
   await post.remove();
 
   return res.status(200).json({ success: true, data: [] });
+});
+
+// @des Upload photo for Post
+// @route PUT /api/products/:id/image
+// @access  Private
+exports.postImageUpload = asyncHandler(async (req, res, next) => {
+  const post = await Post.findById(req.params.id);
+
+  console.log(4);
+  if (!post) {
+    return next(new ErrorResponse(`Error`, 404));
+  }
+
+  // Create custom filename
+  const image = await Image.create({
+    user: req.user.id,
+    post: req.params.id
+  });
+
+  const file = req.files.file;
+
+  file.name = `photo_${image._id}${path.parse(file.name).ext}`;
+  image.path = file.name;
+  await image.save();
+  console.log(file.name);
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
+    if (err) {
+      console.error(err);
+      // Delete Image
+      image.remove();
+      return next(new ErrorResponse(`Problem with file upload`, 404));
+    }
+
+    const updatedPost = await Post.findById(req.params.id).populate("images");
+
+    res.status(200).json({ success: true, data: updatedPost });
+  });
 });

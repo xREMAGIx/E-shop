@@ -1,12 +1,14 @@
 const express = require("express");
 const { protect } = require("../middlewares/auth");
+const { imageUpload } = require("../middlewares/file");
 const {
   getPost,
   getPosts,
   getUserPost,
   updatePost,
   deletePost,
-  createPost
+  createPost,
+  postImageUpload
 } = require("../controllers/post");
 
 const router = express.Router();
@@ -23,5 +25,7 @@ router
   .delete(protect, deletePost);
 
 router.route("/user/:userId").get(getUserPost);
+
+router.route("/:id/image").put(protect, imageUpload, postImageUpload);
 
 module.exports = router;

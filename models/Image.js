@@ -16,7 +16,7 @@ const ImageSchema = new mongoose.Schema({
     ref: "Product"
   },
 
-  product: {
+  post: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post"
   },

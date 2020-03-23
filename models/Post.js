@@ -7,7 +7,7 @@ const PostSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       require: true
     },
-    contain: {
+    content: {
       type: String,
       minlength: [5, "Contain must have at least 5 charaters"]
     },
