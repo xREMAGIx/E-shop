@@ -24,6 +24,12 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+    size: [
+      {
+        type: String
+      }
+    ],
+    description: String,
     createAt: {
       type: Date,
       default: Date.now
