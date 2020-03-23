@@ -1,13 +1,15 @@
 const path = require("path");
 const Product = require("../models/Product");
+const Image = require("../models/Image");
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
+const fs = require("fs");
 
 // @des Get all products
 // @route GET /api/products
 // @access  Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
-  const products = await Product.find();
+  const products = await Product.find().populate("images", "path");
   res
     .status(200)
     .json({ success: true, count: products.length, data: products });
@@ -56,11 +58,23 @@ exports.updateProduct = asyncHandler(async (req, res, next) => {
 // @route DELETE /api/products/:id
 // @access  Private
 exports.deleteProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findByIdAndDelete(req.params.id);
+  const product = await Product.findByIdAndRemove(req.params.id);
 
   if (!product) {
     return next(new ErrorResponse(`Error`, 500));
   }
+
+  // Delete all Image
+  const images = await Image.find({ product: product._id });
+  // Remove Image
+  images.forEach(image => {
+    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image._id}`, function(err) {
+      console.log(err);
+    });
+  });
+
+  // Delete Image in database
+  await Image.deleteMany({ product: product._id });
 
   res.status(200).json({ success: true, data: product });
 });
@@ -96,20 +110,26 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     );
 
   // Create custom filename
-  file.name = `photo_${product._id}${path.parse(file.name).ext}`;
+  const image = await Image.create({
+    path: file.name,
+    user: req.user.id,
+    product: req.params.id
+  });
 
+  file.name = `photo_${image._id}${path.parse(file.name).ext}`;
   console.log(file.name);
   file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
     if (err) {
       console.error(err);
-
+      // Delete Image
+      image.remove();
       return next(new ErrorResponse(`Problem with file upload`, 404));
     }
 
-    const product = await Product.findByIdAndUpdate(req.params.id, {
-      image: file.name
-    });
+    const updatedProduct = await Product.findById(req.params.id).populate(
+      "images"
+    );
 
-    res.status(200).json({ success: true, data: product });
+    res.status(200).json({ success: true, data: updatedProduct });
   });
 });

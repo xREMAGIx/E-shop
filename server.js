@@ -19,6 +19,8 @@ connectDB();
 const products = require("./routes/products");
 const auth = require("./routes/auth");
 const cart = require("./routes/cart");
+const user = require("./routes/user");
+const post = require("./routes/post");
 
 const app = express();
 
@@ -54,10 +56,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/products", products);
 app.use("/api/auth", auth);
 app.use("/api/cart", cart);
-
-app.get("/", (req, res) => {
-  res.send("Helslo");
-});
+app.use("/api/user", user);
+app.use("/api/posts", post);
 
 app.use(errorHandler);
 
