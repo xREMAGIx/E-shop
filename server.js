@@ -23,6 +23,7 @@ connectDB();
 const products = require("./routes/products");
 const auth = require("./routes/auth");
 const cart = require("./routes/cart");
+const orders = require('./routes/orders');
 
 const app = express();
 const server = require('http').Server(app);
@@ -60,9 +61,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/products", products);
 app.use("/api/auth", auth);
 app.use("/api/cart", cart);
-
+app.use('/api/orders', orders);
 app.get("/", (req, res) => {
-	res.send("Helslo");
+	res.send("Hello \' bẹn trèn đèo sĩ mẹnh \' ");
 });
 
 app.use(errorHandler);
