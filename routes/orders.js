@@ -1,5 +1,4 @@
 const { protect, roleProtect } = require("../middlewares/auth");
-const Carts = - require('../models/Cart');
 const oders_ctr = require('../controllers/orders');
 
 const express = require('express');
