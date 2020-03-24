@@ -1,7 +1,5 @@
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
-const User = require("../models/User");
-const mongoose = require("mongoose");
 const Post = require("../models/Post");
 const Image = require("../models/Image");
 const path = require("path");

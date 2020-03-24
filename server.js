@@ -10,7 +10,7 @@ const colors = require("colors");
 const session = require("express-session");
 const dns = require("dns");
 const os = require("os");
-const Visitor = require("../models/visitor");
+const Visitor = require("./models/Visitor");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -85,6 +85,7 @@ process.on("unhandledRejection", (err, promise) => {
   server.close(() => process.exit(1));
 });
 
+// Get online user
 io.on("connection", function(socket) {
   try {
     dns.lookup(os.hostname(), function(err, ip, fam) {
