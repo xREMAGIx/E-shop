@@ -24,6 +24,7 @@ const auth = require("./routes/auth");
 const cart = require("./routes/cart");
 const user = require("./routes/user");
 const post = require("./routes/post");
+const orders = require("./routes/orders");
 
 const app = express();
 const server = require("http").Server(app);
@@ -63,6 +64,7 @@ app.use("/api/auth", auth);
 app.use("/api/cart", cart);
 app.use("/api/user", user);
 app.use("/api/posts", post);
+app.use("/api/orders", orders);
 
 app.use(errorHandler);
 
