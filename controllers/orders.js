@@ -49,7 +49,7 @@ module.exports.Create0der = (req, res) => {
             if (cart) {
                 let totalprice = 0;
                 cart.products.forEach(async x => {
-                    totalprice += x.quantity * (x.price - x.discount / 100 * x.price);
+                    totalprice += x.amount * (x.price - x.discount / 100 * x.price);
                 })
                 console.log(cart.products)
                 const today = new Date();
