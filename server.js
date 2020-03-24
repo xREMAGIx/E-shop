@@ -8,6 +8,9 @@ const cookieParser = require("cookie-parser");
 const errorHandler = require("./middlewares/error");
 const colors = require("colors");
 const session = require("express-session");
+const dns = require("dns");
+const os = require("os");
+const Visitor = require("../models/visitor");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -23,6 +26,8 @@ const user = require("./routes/user");
 const post = require("./routes/post");
 
 const app = express();
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
 
 // Session
 
@@ -63,7 +68,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(
+server.listen(
   PORT,
   console.log(
     `Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`
@@ -76,4 +81,68 @@ process.on("unhandledRejection", (err, promise) => {
   console.log(`Error: ${err.name}`.red);
   // Close server and axit process
   server.close(() => process.exit(1));
+});
+
+io.on("connection", function(socket) {
+  try {
+    dns.lookup(os.hostname(), function(err, ip, fam) {
+      if (err) throw err;
+      Visitor.findOne({ ip: ip }, (err, visitor) => {
+        if (visitor) {
+          let num = visitor.visitCount;
+          const today = new Date();
+          visitor.updateOne({
+            visitCount: ++num,
+            lastVisit: Date.parse(
+              today.getFullYear() +
+                "-" +
+                (today.getMonth() + 1) +
+                "-" +
+                today.getDate() +
+                "  " +
+                today.getHours() +
+                ":" +
+                today.getMinutes() +
+                ":" +
+                today.getSeconds()
+            ),
+            online: "true"
+          });
+        } else {
+          Visitor.create({
+            ip: ip,
+            visitCount: 1,
+            lastVisit: Date.parse(
+              today.getFullYear() +
+                "-" +
+                (today.getMonth() + 1) +
+                "-" +
+                today.getDate() +
+                "  " +
+                today.getHours() +
+                ":" +
+                today.getMinutes() +
+                ":" +
+                today.getSeconds()
+            ),
+            online: "true"
+          });
+        }
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+  socket.on("disconnect", function() {
+    try {
+      Visitor.updateOne(
+        { guestId: ip },
+        {
+          online: "false"
+        }
+      );
+    } catch (error) {
+      throw error;
+    }
+  });
 });
