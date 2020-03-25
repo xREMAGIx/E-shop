@@ -6,7 +6,7 @@ exports.imageUpload = async (req, res, next) => {
       return next(new ErrorResponse(`Please upload a file`, 400));
     }
 
-    const file = req.files.file;
+    const file = req.files.image;
 
     // Make sure the image is a photo
     if (!file.mimetype.startsWith("image")) {

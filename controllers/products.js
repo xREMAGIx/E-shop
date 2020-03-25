@@ -9,10 +9,17 @@ const fs = require("fs");
 // @route GET /api/products
 // @access  Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
+  const perPage = 10;
+  const page = parseInt(req.query.pages, 10);
   const products = await Product.find().populate("images", "path");
-  res
-    .status(200)
-    .json({ success: true, count: products.length, data: products });
+  let maxPage = (products.length % perPage == 0) ? products.length / perPage : products.length % perPage + 1;
+  let newProducts = products.slice((page - 1) * 10, page * perPage - 1)
+  res.status(200).json({
+    success: true,
+    data: newProducts,
+    page: parseInt(req.query.pages, 10),
+    maxPage: maxPage
+  });
 });
 
 // @des Get product
@@ -70,7 +77,7 @@ exports.deleteProduct = asyncHandler(async (req, res, next) => {
   console.log(images);
   images.forEach(image => {
     console.log("image " + image);
-    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image.path}`, function(err) {
+    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image.path}`, function (err) {
       console.log(err);
     });
   });
@@ -91,26 +98,7 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Error`, 404));
   }
 
-  if (!req.files) {
-    return next(new ErrorResponse(`Please upload a file`, 400));
-  }
-
-  const file = req.files.file;
-
-  // Make sure the image is a photo
-  if (!file.mimetype.startsWith("image")) {
-    return next(new ErrorResponse(`Please upload a image file`, 400));
-  }
-
-  // Check filesize
-  if (file.size > process.env.MAX_FILE_UPLOAD)
-    return next(
-      new ErrorResponse(
-        `Please upload a image file less than ${process.env.MAX_FILE_UPLOAD}`,
-        404
-      )
-    );
-
+  const file = req.files.image
   // Create custom filename
   const image = await Image.create({
     user: req.user.id,
