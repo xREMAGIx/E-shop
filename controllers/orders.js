@@ -1,18 +1,19 @@
 const Orders = require("../models/Orders");
-const Carts = require("../models/Cart");
-const Products = require("../models/Product");
-
+const Cart = require("../models/Cart");
+const Product = require("../models/Product");
+const ErrorResponse = require("../utils/errorResponse");
 module.exports.getOders = (req, res) => {
   try {
     Orders.find({}, (err, orders) => {
       if (orders) {
         return res.json({
           message: "success",
-          order: orders
+          data: orders
         });
       } else {
         return res.json({
-          message: "orders is empty"
+          message: "orders is empty",
+          data: []
         });
       }
     });
@@ -35,60 +36,35 @@ module.exports.getOder = (req, res) => {
       }
     });
   } catch (error) {
-    res.sendStatus(404);
+    return new ErrorResponse("", 404)
   }
 };
 
-module.exports.Create0der = (req, res) => {
+module.exports.Create0der = async (req, res) => {
   try {
-    Carts.findOne({ user: req.user._id }, (err, cart) => {
-      if (err) {
-        return res.json({
-          message: " cart  not found"
-        });
-      }
-      if (cart) {
-        let totalprice = 0;
-        cart.products.forEach(async x => {
-          totalprice += x.quantity * (x.price - (x.discount / 100) * x.price);
-        });
-        console.log(cart.products);
-        const today = new Date();
-        Orders.create({
-          user: req.user._id,
-          products: cart.products,
-          totalPrice: totalprice,
-          payMent: req.query.payment,
-          dateOrder: Date.parse(
-            today.getFullYear() +
-              "-" +
-              (today.getMonth() + 1) +
-              "-" +
-              today.getDate() +
-              "  " +
-              today.getHours() +
-              ":" +
-              today.getMinutes() +
-              ":" +
-              today.getSeconds()
-          )
-        }).then(order => {
-          if (order) {
-            cart.remove();
-            return res.json({
-              message: "sucess",
-              order: order
-            });
-          }
-        });
-      } else {
-        return res.json({
-          message: "cart  is empty , you can't create your orders"
-        });
-      }
+    let cart = await Cart.findOne({ user: req.user.id });
+
+    cart = JSON.parse(JSON.stringify(cart));
+    let productIds = [];
+    let amount = {};
+    cart.products.map(product => {
+      productIds.push(product.product);
+      amount[product.product] = product.amount;
     });
+    const products = await Product.find({ _id: { $in: productIds } });
+    let total = 0;
+    products.map(product => {
+      console.log(total);
+      total += amount[product._id] * (product.price - product.discount / 100 * product.price);
+    });
+    cart.products = [];
+    await Cart.findOneAndUpdate(
+      { user: req.user.id },
+      { products: cart.products }
+    );
+    return res.status(200).json({ success: true, data: cart, total });
   } catch (error) {
     res.sendStatus(404);
   }
 };
-module.exports.confirmOder = () => {};
+module.exports.confirmOder = () => { };
