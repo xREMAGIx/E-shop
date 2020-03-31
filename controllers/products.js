@@ -33,6 +33,7 @@ exports.getProduct = asyncHandler(async (req, res, next) => {
 exports.createProduct = asyncHandler(async (req, res, next) => {
   console.log(req.body);
 
+  console.log("COn cac");
   const product = await Product.create(req.body);
 
   res.status(200).json({ success: true, data: product });
@@ -95,44 +96,56 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Please upload a file`, 400));
   }
 
-  const file = req.files.file;
+  let files = [];
 
-  // Make sure the image is a photo
-  if (!file.mimetype.startsWith("image")) {
-    return next(new ErrorResponse(`Please upload a image file`, 400));
-  }
+  Array.isArray(req.files.file) === false
+    ? files.push(req.files.file)
+    : (files = [...req.files.file]);
 
-  // Check filesize
-  if (file.size > process.env.MAX_FILE_UPLOAD)
-    return next(
-      new ErrorResponse(
-        `Please upload a image file less than ${process.env.MAX_FILE_UPLOAD}`,
-        404
-      )
-    );
+  console.log(files);
 
-  // Create custom filename
-  const image = await Image.create({
-    user: req.user.id,
-    product: req.params.id
-  });
-
-  file.name = `photo_${image._id}${path.parse(file.name).ext}`;
-  image.path = file.name;
-  await image.save();
-  console.log(file.name);
-  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err => {
-    if (err) {
-      console.error(err);
-      // Delete Image
-      image.remove();
-      return next(new ErrorResponse(`Problem with file upload`, 404));
+  for (let i = 0; i < files.length; i++) {
+    // Make sure the image is a photo
+    console.log(files[i]);
+    if (!files[i].mimetype.startsWith("image")) {
+      console.log("MineType " + !files[i].mimetype);
+      return next(new ErrorResponse(`Please upload a image file`, 400));
     }
+    console.log(2);
+    // Check filesize
+    if (files[i].size > process.env.MAX_FILE_UPLOAD)
+      return next(
+        new ErrorResponse(
+          `Please upload a image file less than ${process.env.MAX_FILE_UPLOAD}`,
+          404
+        )
+      );
+    console.log(3);
+    // Create custom filename
+    const image = await Image.create({
+      user: req.user.id,
+      product: req.params.id
+    });
 
-    const updatedProduct = await Product.findById(req.params.id).populate(
-      "images"
+    files[i].name = `photo_${image._id}${path.parse(files[i].name).ext}`;
+    image.path = files[i].name;
+    await image.save();
+
+    files[i].mv(
+      `${process.env.FILE_UPLOAD_PATH}/${files[i].name}`,
+      async err => {
+        if (err) {
+          console.error(err);
+          // Delete Image
+          image.remove();
+          return next(new ErrorResponse(`Problem with file upload`, 404));
+        }
+      }
     );
+  }
+  const updatedProduct = await Product.findById(req.params.id).populate(
+    "images"
+  );
 
-    res.status(200).json({ success: true, data: updatedProduct });
-  });
+  return res.status(200).json({ success: true, data: updatedProduct });
 });

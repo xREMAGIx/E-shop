@@ -1,10 +1,8 @@
-const crypto = require("crypto");
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
 const User = require("../models/User");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
-const mongoose = require("mongoose");
 
 // @des View Cart
 // @route GET /api/cart/
@@ -120,7 +118,6 @@ exports.decreaseCart = asyncHandler(async (req, res, next) => {
 // @route Delete /api/cart/:productId
 // @access  Private
 exports.DeleteItemFromCart = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
   let cart = await Cart.findOne({ user: req.user.id });
 
   if (!cart) cart = await Cart.create({ user: req.user.id });
