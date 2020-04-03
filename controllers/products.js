@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 const Image = require("../models/Image");
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
+const Filter = require("../utils/productsFilter");
 const fs = require("fs");
 
 // @des Get all products
@@ -10,17 +11,19 @@ const fs = require("fs");
 // @access  Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
   const perPage = 10;
-  const page = parseInt(req.query.pages, 10);
+  const page = parseInt(req.query.pages, 10) || 1;
   const products = await Product.find().populate("images", "path");
+
   let maxPage =
     products.length % perPage == 0
-      ? products.length / perPage
-      : (products.length % perPage) + 1;
+      ? Math.ceil(products.length / perPage)
+      : Math.floor(products.length / perPage) + 1;
+
   let newProducts = products.slice((page - 1) * 10, page * perPage - 1);
   res.status(200).json({
     success: true,
     data: newProducts,
-    page: parseInt(req.query.pages, 10),
+    page: page,
     maxPage: maxPage
   });
 });
@@ -167,4 +170,61 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
   );
 
   return res.status(200).json({ success: true, data: updatedProduct });
+});
+
+//  ----------------------------------------products  filter----------------------------------------------------------//
+
+exports.productsFilter = asyncHandler((req, res) => {
+  const {
+    cate,
+    sold,
+    priceFrom,
+    priceTo,
+    createAt,
+    greatDiscounts
+  } = req.query;
+
+  if (cate) {
+    Filter.filterProductsByCategogy(cate).then(list => {
+      res.json({
+        success: true,
+        data: list
+      });
+    });
+  } else if (priceFrom && priceTo) {
+    const from = parseFloat(priceFrom, 10);
+    const to = parseFloat(priceTo, 10);
+    Filter.filterProductsByPrice(from, to).then(list => {
+      res.json({
+        success: true,
+        data: list
+      });
+    });
+  } else if (createAt) {
+    Filter.filterProductsByNewest().then(list => {
+      res.json({
+        success: true,
+        data: list
+      });
+    });
+  } else if (sold) {
+    Filter.filterProductsByBestSold().then(list => {
+      res.json({
+        success: true,
+        data: list
+      });
+    });
+  } else if (greatDiscounts) {
+    Filter.filterProductsByGreatDiscounts().then(list => {
+      res.json({
+        success: true,
+        data: list
+      });
+    });
+  } else {
+    res.json({
+      success: false,
+      data: []
+    });
+  }
 });

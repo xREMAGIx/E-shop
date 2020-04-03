@@ -33,6 +33,10 @@ const ProductSchema = new mongoose.Schema(
     createAt: {
       type: Date,
       default: Date.now
+    },
+    sold: {
+      type: Number,
+      default: 0
     }
   },
   {
@@ -56,7 +60,7 @@ ProductSchema.pre("remove", async () => {
   const images = await Image.find({ product: this._id });
   // Remove Image
   images.forEach(image => {
-    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image._id}`, function(err) {
+    fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image._id}`, function (err) {
       console.log(err);
     });
   });

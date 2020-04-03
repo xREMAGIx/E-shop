@@ -86,66 +86,66 @@ process.on("unhandledRejection", (err, promise) => {
 });
 
 // Get online user
-io.on("connection", function(socket) {
-  try {
-    dns.lookup(os.hostname(), function(err, ip, fam) {
-      if (err) throw err;
-      Visitor.findOne({ ip: ip }, (err, visitor) => {
-        if (visitor) {
-          let num = visitor.visitCount;
-          const today = new Date();
-          visitor.updateOne({
-            visitCount: ++num,
-            lastVisit: Date.parse(
-              today.getFullYear() +
-                "-" +
-                (today.getMonth() + 1) +
-                "-" +
-                today.getDate() +
-                "  " +
-                today.getHours() +
-                ":" +
-                today.getMinutes() +
-                ":" +
-                today.getSeconds()
-            ),
-            online: "true"
-          });
-        } else {
-          Visitor.create({
-            ip: ip,
-            visitCount: 1,
-            lastVisit: Date.parse(
-              today.getFullYear() +
-                "-" +
-                (today.getMonth() + 1) +
-                "-" +
-                today.getDate() +
-                "  " +
-                today.getHours() +
-                ":" +
-                today.getMinutes() +
-                ":" +
-                today.getSeconds()
-            ),
-            online: "true"
-          });
-        }
-      });
-    });
-  } catch (error) {
-    throw error;
-  }
-  socket.on("disconnect", function() {
-    try {
-      Visitor.updateOne(
-        { guestId: ip },
-        {
-          online: "false"
-        }
-      );
-    } catch (error) {
-      throw error;
-    }
-  });
-});
+// io.on("connection", function(socket) {
+//   try {
+//     dns.lookup(os.hostname(), function(err, ip, fam) {
+//       if (err) throw err;
+//       Visitor.findOne({ ip: ip }, (err, visitor) => {
+//         if (visitor) {
+//           let num = visitor.visitCount;
+//           const today = new Date();
+//           visitor.updateOne({
+//             visitCount: ++num,
+//             lastVisit: Date.parse(
+//               today.getFullYear() +
+//                 "-" +
+//                 (today.getMonth() + 1) +
+//                 "-" +
+//                 today.getDate() +
+//                 "  " +
+//                 today.getHours() +
+//                 ":" +
+//                 today.getMinutes() +
+//                 ":" +
+//                 today.getSeconds()
+//             ),
+//             online: "true"
+//           });
+//         } else {
+//           Visitor.create({
+//             ip: ip,
+//             visitCount: 1,
+//             lastVisit: Date.parse(
+//               today.getFullYear() +
+//                 "-" +
+//                 (today.getMonth() + 1) +
+//                 "-" +
+//                 today.getDate() +
+//                 "  " +
+//                 today.getHours() +
+//                 ":" +
+//                 today.getMinutes() +
+//                 ":" +
+//                 today.getSeconds()
+//             ),
+//             online: "true"
+//           });
+//         }
+//       });
+//     });
+//   } catch (error) {
+//     throw error;
+//   }
+//   socket.on("disconnect", function() {
+//     try {
+//       Visitor.updateOne(
+//         { guestId: ip },
+//         {
+//           online: "false"
+//         }
+//       );
+//     } catch (error) {
+//       throw error;
+//     }
+//   });
+// });

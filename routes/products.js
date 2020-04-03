@@ -5,7 +5,8 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  productImageUpload
+  productImageUpload,
+  productsFilter
 } = require("../controllers/products");
 
 const { protect, roleProtect } = require("../middlewares/auth");
@@ -16,10 +17,10 @@ const router = express.Router();
 router
   .route("/")
   .get(getProducts)
-  .post(protect, roleProtect("admin"), createProduct);
-
+  // .post(protect, roleProtect("admin"), createProduct);
+  .post(createProduct);
 router
-  .route("/:id")
+  .route("/:id?")
   .get(getProduct)
   .put(protect, roleProtect("admin"), updateProduct)
   .delete(protect, roleProtect("admin"), deleteProduct);
@@ -29,4 +30,6 @@ router
   .put(checkImage.imageUpload, protect, roleProtect("admin"), productImageUpload)
   .post(checkImage.imageUpload, protect, roleProtect("admin"), productImageUpload);
 
+
+router.get("/filter/by", productsFilter);
 module.exports = router;
