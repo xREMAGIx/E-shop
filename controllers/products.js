@@ -102,6 +102,7 @@ exports.deleteProduct = asyncHandler(async (req, res, next) => {
 // @route PUT /api/products/:id/image
 // @access  Private
 exports.productImageUpload = asyncHandler(async (req, res, next) => {
+  console.log(1);
   const product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -114,20 +115,17 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
 
   let files = [];
 
-  Array.isArray(req.files.file) === false
-    ? files.push(req.files.file)
-    : (files = [...req.files.file]);
+  Array.isArray(req.files.image) === false
+    ? files.push(req.files.image)
+    : (files = [...req.files.image]);
 
+  console.log(2);
   console.log(files);
-  const file = req.files.image;
-  // Create custom filename
-  const image = await Image.create({
-    user: req.user.id,
-    product: req.params.id
-  });
 
+  console.log(3);
   for (let i = 0; i < files.length; i++) {
     // Make sure the image is a photo
+    console.log(4);
     console.log(files[i]);
     if (!files[i].mimetype.startsWith("image")) {
       console.log("MineType " + !files[i].mimetype);
@@ -145,7 +143,7 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     console.log(3);
     // Create custom filename
     const image = await Image.create({
-      user: req.user.id,
+      //    user: req.user.id,
       product: req.params.id
     });
 
