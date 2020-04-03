@@ -20,6 +20,7 @@ module.exports.getOders = (req, res) => {
     res.sendStatus(404);
   }
 };
+
 module.exports.getOder = (req, res) => {
   try {
     Orders.findById(req.params.id, (err, order) => {

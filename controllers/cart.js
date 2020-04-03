@@ -62,8 +62,6 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
 
     req.session.cart.products.push({
       product: productId,
-      price: product.price,
-      discount: product.discount,
       amount: 1
     });
 

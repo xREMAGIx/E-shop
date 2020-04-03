@@ -9,17 +9,30 @@ const fs = require("fs");
 // @route GET /api/products
 // @access  Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
+  const perPage = 10;
+  const page = parseInt(req.query.pages, 10);
   const products = await Product.find().populate("images", "path");
-  res
-    .status(200)
-    .json({ success: true, count: products.length, data: products });
+  let maxPage =
+    products.length % perPage == 0
+      ? products.length / perPage
+      : (products.length % perPage) + 1;
+  let newProducts = products.slice((page - 1) * 10, page * perPage - 1);
+  res.status(200).json({
+    success: true,
+    data: newProducts,
+    page: parseInt(req.query.pages, 10),
+    maxPage: maxPage
+  });
 });
 
 // @des Get product
 // @route GET /api/products/:id
 // @access  Public
 exports.getProduct = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).populate(
+    "images",
+    "path"
+  );
 
   if (!product) {
     return next(new ErrorResponse(`Error`, 404));
@@ -103,6 +116,12 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     : (files = [...req.files.file]);
 
   console.log(files);
+  const file = req.files.image;
+  // Create custom filename
+  const image = await Image.create({
+    user: req.user.id,
+    product: req.params.id
+  });
 
   for (let i = 0; i < files.length; i++) {
     // Make sure the image is a photo
