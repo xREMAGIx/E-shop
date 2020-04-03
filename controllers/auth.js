@@ -108,7 +108,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
-  return status(200).json({ success: true, data: user });
+  return res.status(200).json({ success: true, data: user });
 });
 
 // @des Get Reset password
