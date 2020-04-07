@@ -25,6 +25,7 @@ const cart = require("./routes/cart");
 const user = require("./routes/user");
 const post = require("./routes/post");
 const orders = require("./routes/orders");
+const promotion = require("./routes/promotion");
 
 const app = express();
 const server = require("http").Server(app);
@@ -65,12 +66,13 @@ app.use("/api/cart", cart);
 app.use("/api/user", user);
 app.use("/api/posts", post);
 app.use("/api/orders", orders);
+app.use("/api/promotion", promotion);
 
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(
+module.exports = server.listen(
   PORT,
   console.log(
     `Server running in ${process.env.NODE_ENV} mode on port ${process.env.PORT}`

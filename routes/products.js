@@ -17,10 +17,10 @@ const router = express.Router();
 router
   .route("/")
   .get(getProducts)
-  // .post(protect, roleProtect("admin"), createProduct);
-  .post(createProduct);
+  .post(protect, roleProtect("admin"), createProduct);
+// .post(createProduct);
 router
-  .route("/:id?")
+  .route("/:id")
   .get(getProduct)
   .put(protect, roleProtect("admin"), updateProduct)
   .delete(protect, roleProtect("admin"), deleteProduct);

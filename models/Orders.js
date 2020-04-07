@@ -12,7 +12,7 @@ const Orders_schema = new mongoose.Schema({
         ref: "products",
         required: true
       },
-      quantity: {
+      amount: {
         type: Number,
         required: true
       }

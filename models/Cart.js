@@ -10,7 +10,6 @@ const CartSchema = new mongoose.Schema({
       amount: Number
     }
   ],
-
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user"
