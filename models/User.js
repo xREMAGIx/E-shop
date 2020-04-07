@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 
   isAuthentication: {
     type: Boolean,
-    default: false
+    default: true
   },
   authenticationToken: String,
   confirmEmailExpire: Date,
@@ -45,7 +45,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Encrypt password
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function(next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -54,19 +54,19 @@ UserSchema.pre("save", async function (next) {
 });
 
 // Sign JWT and returnJwtToken
-UserSchema.methods.getSignedJwtToken = function () {
+UserSchema.methods.getSignedJwtToken = function() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE
   });
 };
 
 // Compare Password
-UserSchema.methods.matchPassword = async function (enteredPassword) {
+UserSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // Generate and hash password token
-UserSchema.methods.getResetPasswordToken = function () {
+UserSchema.methods.getResetPasswordToken = function() {
   // Generate token
   const resetToken = crypto.randomBytes(20).toString("hex");
 
@@ -83,7 +83,7 @@ UserSchema.methods.getResetPasswordToken = function () {
 };
 
 // Generate and hash confirm Email token
-UserSchema.methods.getConfirmEmailToken = function () {
+UserSchema.methods.getConfirmEmailToken = function() {
   // Generate token
   const confirmToken = crypto.randomBytes(20).toString("hex");
 

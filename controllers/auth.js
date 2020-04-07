@@ -108,7 +108,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
-  return status(200).json({ success: true, data: user });
+  return res.status(200).json({ success: true, data: user });
 });
 
 // @des Get Reset password
@@ -233,3 +233,15 @@ const sendTokenResponse = (user, statusCode, res) => {
     .cookie("token", token, options)
     .json({ success: true, token });
 };
+
+// @des Logout and clear cookie
+// @route POST /api/auth/logout
+// @access  Private
+exports.logout = asyncHandler(async (req, res, next) => {
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  return status(200).json({ success: true, data: {} });
+});
