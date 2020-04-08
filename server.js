@@ -26,6 +26,7 @@ const user = require("./routes/user");
 const post = require("./routes/post");
 const orders = require("./routes/orders");
 const promotion = require("./routes/promotion");
+const banner = require("./routes/banner");
 
 const app = express();
 const server = require("http").Server(app);
@@ -38,7 +39,7 @@ app.use(
     secret: "keyboard cat",
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 1000 }
+    cookie: { maxAge: 1000 * 60 * 60 * 1000 },
   })
 );
 
@@ -67,6 +68,7 @@ app.use("/api/user", user);
 app.use("/api/posts", post);
 app.use("/api/orders", orders);
 app.use("/api/promotion", promotion);
+app.use("/api/banner", banner);
 
 app.use(errorHandler);
 
