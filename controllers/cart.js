@@ -14,7 +14,7 @@ const createCart = async user => {
   return cart;
 };
 exports.viewCart = asyncHandler(async (req, res, next) => {
-  console.log("userID: ", req.user.id);
+  //console.log("userID: ", req.user.id);
   let cart = req.session.cart;
 
   if (!cart) cart = await createCart(req.user);
@@ -31,18 +31,14 @@ exports.viewCart = asyncHandler(async (req, res, next) => {
 // @route PUT /api/cart/:productId
 // @access  Private
 exports.addToCart = asyncHandler(async (req, res, next) => {
-  console.log("User' cart: ", req.session.cart);
+
   let cart = req.session.cart;
-
   if (!cart) cart = await createCart(req.user);
-
-  console.log(cart);
 
   const productId = req.params.productId;
   let exits = false;
 
   cart.products.map(product => {
-    console.log(product._id);
     if (product.product === productId) {
       product.amount++;
       exits = true;
@@ -52,27 +48,17 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
 
   if (exits === false) {
     const product = await Product.findById(productId);
-
-    console.log("Add to cart");
-    console.log(cart.products);
-
     if (!product) return next(new ErrorResponse("Product not found", 404));
-
     req.session.cart = cart;
-
     req.session.cart.products.push({
       product: productId,
       amount: 1
     });
-
-    console.log(cart.products);
-    console.log("ahihi");
   }
 
   cart.createdAt = Date.now();
-
   req.session.cart = cart;
-
+  await Cart.findOneAndUpdate({ user: req.user._id }, { products: cart.products })
   return res.status(200).json({ success: true, data: cart });
 });
 
@@ -81,13 +67,9 @@ exports.addToCart = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.decreaseCart = asyncHandler(async (req, res, next) => {
   let cart = req.session.cart;
-
   if (!cart) cart = await createCart(req.user);
-
   cart = JSON.parse(JSON.stringify(cart));
-
   const productId = req.params.productId;
-
   cart.products.map(product => {
     if (product.product === productId && product.amount >= 1) {
       product.amount--;

@@ -97,7 +97,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!cart) cart = await Cart.create({ user: user._id });
   req.session.cart = cart;
 
-  console.log("req.session.cart ", cart);
+  // console.log("req.session.cart ", cart);
 
   sendTokenResponse(user, 200, res);
 });
