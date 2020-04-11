@@ -130,7 +130,7 @@ exports.deleteProductImages = asyncHandler(async (req, res, next) => {
 exports.deleteProductImage = asyncHandler(async (req, res, next) => {
   const image = await Image.deleteMany({
     product: req.params.id,
-    _id: imageId,
+    _id: req.params.imageId,
   });
 
   if (!image) return next(new ErrorResponse("Image or Product not found", 404));
