@@ -244,5 +244,5 @@ exports.logout = asyncHandler(async (req, res, next) => {
     httpOnly: true,
   });
 
-  return status(200).json({ success: true, data: {} });
+  return res.status(200).json({ success: true, data: {} });
 });
