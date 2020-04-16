@@ -13,7 +13,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(protect, roleProtect("admin"), imageUpload, UploadBanner)
+  .post(protect, roleProtect("admin"), UploadBanner)
   .get(protect, roleProtect("admin"), getAllBanners);
 
 router

@@ -33,46 +33,50 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
   }
 
   // Check single file
-  const image = Array.isArray(req.files.image)
-    ? req.files.image[0]
-    : req.files.image;
+  let images = [];
+  Array.isArray(req.files.image) == false
+    ? images.push(req.files.image)
+    : (images = [...req.files.image]);
+  console.log("-----------------------------------");
+  console.log(req.files.image);
+  console.log("-----------------------------------");
+  console.log(images);
 
-  let bannerImage = new BannerImage();
-  // Check Image file
-  if (!image.mimetype.startsWith("image")) {
-    return next(new ErrorResponse(`Please upload a image file`, 400));
-  }
-
-  // Check filesize
-  if (image.size > process.env.MAX_FILE_UPLOAD)
-    return next(
-      new ErrorResponse(
-        `Please upload a image file less than ${process.env.MAX_FILE_UPLOAD}`,
-        404
-      )
+  for (let i = 0; i < images.length; i++) {
+    // Make sure the image is a photo
+    if (!images[i].mimetype.startsWith("image")) {
+      console.log("MineType " + !images[i].mimetype);
+      return next(new ErrorResponse(`Please upload a image file`, 400));
+    }
+    // Check filesize
+    if (images[i].size > process.env.MAX_FILE_UPLOAD)
+      return next(
+        new ErrorResponse(
+          `Please upload a image file less than ${process.env.MAX_FILE_UPLOAD}`,
+          404
+        )
+      );
+    let bannerImage = new BannerImage();
+    bannerImage.path = `banner_${bannerImage._id}.jpg`;
+    images[i].mv(
+      `${process.env.FILE_UPLOAD_PATH}/${bannerImage.path}`,
+      async (err) => {
+        if (err) {
+          console.error(err);
+          // Delete Image
+          return next(new ErrorResponse(`Problem with file upload`, 404));
+        }
+      }
     );
 
-  bannerImage.path = `banner_${bannerImage._id}.jpg`;
-  image.mv(
-    `${process.env.FILE_UPLOAD_PATH}/${bannerImage.path}`,
-    async (err) => {
-      if (err) {
-        console.error(err);
-        // Delete Image
-        return next(new ErrorResponse(`Problem with file upload`, 404));
-      }
-    }
-  );
+    await bannerImage.save();
+  }
 
-  await bannerImage.save();
+  const updatedBanner = await BannerImage.find();
 
-  let updatedBanner = await Banner.findOne();
-
-  updatedBanner.path = bannerImage.path;
-
-  await updatedBanner.save();
-
-  return res.status(200).json({ success: true, data: updatedBanner });
+  return res
+    .status(200)
+    .json({ success: true, count: updatedBanner.length, data: updatedBanner });
 });
 
 // @des Get Banner
@@ -81,7 +85,9 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
 exports.getAllBanners = asyncHandler(async (req, res, next) => {
   const banners = await BannerImage.find();
 
-  return res.status(200).json({ success: true, data: banners });
+  return res
+    .status(200)
+    .json({ success: true, count: banners.length, data: banners });
 });
 
 // @des Delete Banner
