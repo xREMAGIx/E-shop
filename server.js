@@ -27,6 +27,8 @@ const post = require("./routes/post");
 const orders = require("./routes/orders");
 const promotion = require("./routes/promotion");
 const banner = require("./routes/banner");
+const categories = require("./routes/categories");
+const brands = require("./routes//brands");
 
 const app = express();
 const server = require("http").Server(app);
@@ -69,6 +71,8 @@ app.use("/api/posts", post);
 app.use("/api/orders", orders);
 app.use("/api/promotion", promotion);
 app.use("/api/banner", banner);
+app.use("/api/categories", categories);
+app.use("/api/brands", brands);
 
 app.use(errorHandler);
 

@@ -7,45 +7,50 @@ const ProductSchema = new mongoose.Schema(
     sku: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     productName: {
       type: String,
-      required: true
+      required: true,
     },
     category: {
-      type: String
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+    brand: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
     },
     price: {
       type: Number,
-      required: true
+      required: true,
     },
     discount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     size: [
       {
-        type: String
-      }
+        type: String,
+      },
     ],
     description: String,
     createAt: {
       type: Date,
-      default: Date.now
+      default: Date.now,
     },
     sold: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   {
     toJSON: {
-      virtuals: true
+      virtuals: true,
     },
     toObject: {
-      virtuals: true
-    }
+      virtuals: true,
+    },
   }
 );
 
@@ -53,13 +58,13 @@ ProductSchema.virtual("images", {
   ref: "Image",
   localField: "_id",
   foreignField: "product",
-  justOne: false
+  justOne: false,
 });
 
 ProductSchema.pre("remove", async () => {
   const images = await Image.find({ product: this._id });
   // Remove Image
-  images.forEach(image => {
+  images.forEach((image) => {
     fs.unlink(`${process.env.FILE_UPLOAD_PATH}/${image._id}`, function (err) {
       console.log(err);
     });
