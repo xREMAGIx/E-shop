@@ -98,7 +98,6 @@ exports.login = asyncHandler(async (req, res, next) => {
   req.session.cart = cart;
 
   // console.log("req.session.cart ", cart);
-
   sendTokenResponse(user, 200, res);
 });
 
@@ -106,6 +105,8 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @route POST /api/auth/me
 // @access  Private
 exports.getMe = asyncHandler(async (req, res, next) => {
+  console.log(1);
+  console.log(req.user);
   const user = await User.findById(req.user.id);
 
   console.log("Get me " + user);
@@ -218,7 +219,6 @@ exports.activeAccount = asyncHandler(async (req, res, next) => {
 const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
-
   const options = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000

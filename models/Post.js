@@ -5,32 +5,32 @@ const PostSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      require: true
+      require: true,
     },
     content: {
       type: String,
-      minlength: [5, "Contain must have at least 5 charaters"]
+      minlength: [5, "Contain must have at least 5 charaters"],
     },
     title: {
       type: String,
-      minlength: [5, "Title must have at least 5 charaters"]
+      minlength: [5, "Title must have at least 5 charaters"],
     },
     createdAt: {
       type: Date,
-      default: Date.now
+      default: Date.now,
     },
     updatedAt: {
       type: Date,
-      default: Date.now
-    }
+      default: Date.now,
+    },
   },
   {
     toJSON: {
-      virtuals: true
+      virtuals: true,
     },
     toObject: {
-      virtuals: true
-    }
+      virtuals: true,
+    },
   }
 );
 
@@ -38,7 +38,7 @@ PostSchema.virtual("images", {
   ref: "Image",
   localField: "_id",
   foreignField: "post",
-  justOne: false
+  justOne: false,
 });
 
 PostSchema.pre("save", () => {

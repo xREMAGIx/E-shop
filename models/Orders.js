@@ -3,32 +3,32 @@ const Orders_schema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    required: true,
   },
   products: [
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "products",
-        required: true
+        required: true,
       },
       amount: {
         type: Number,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   ],
   totalPrice: {
     type: Number,
-    required: true
+    required: true,
   },
   payment: {
     type: String,
-    required: true
+    required: true,
   },
   dateOrder: {
     type: Date,
-    required: true
-  }
+    required: true,
+  },
 });
-module.exports = mongoose.model("oders", Orders_schema);
+module.exports = mongoose.model("orders", Orders_schema);

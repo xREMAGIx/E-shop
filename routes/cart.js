@@ -6,7 +6,7 @@ const {
   deleteCart,
   DeleteItemFromCart,
   checkOutCart,
-  saveCart
+  saveCart,
 } = require("../controllers/cart");
 
 const { protect } = require("../middlewares/auth");

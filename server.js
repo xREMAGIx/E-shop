@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const errorHandler = require("./middlewares/error");
 const colors = require("colors");
 const session = require("express-session");
+var cors = require("cors");
 const dns = require("dns");
 const os = require("os");
 const Visitor = require("./models/Visitor");
@@ -55,6 +56,8 @@ app.use(cookieParser());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+app.use(cors());
 
 // File uploading
 app.use(fileupload());
