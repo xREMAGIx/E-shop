@@ -3,7 +3,10 @@ const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 const Promotion = require("../models/Promotions");
 const ErrorResponse = require("../utils/errorResponse");
+const asyncHandler = require("../middlewares/async");
+
 const moment = require("moment");
+
 module.exports.getOders = (req, res) => {
   try {
     Orders.find({}, (err, orders) => {
@@ -141,4 +144,22 @@ module.exports.Create0der = async (req, res) => {
     res.json({ error: error });
   }
 };
+
+// @des Update category
+// @route PUT /api/categories/:id
+// @access  Admin
+exports.updateOrder = asyncHandler(async (req, res, next) => {
+  let order = await Orders.findById(req.params.id);
+  console.log(req.body);
+  if (!order) return next(new ErrorResponse("Order not found", 404));
+
+  console.log(req.body);
+
+  order = await Orders.findOneAndUpdate({ _id: req.params.id }, req.body, {
+    new: true,
+  });
+
+  return res.status(200).json({ success: true, data: order });
+});
+
 module.exports.confirmOder = () => {};

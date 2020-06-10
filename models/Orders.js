@@ -30,5 +30,10 @@ const Orders_schema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["pending", "shipping", "completed", "cancelled"],
+    default: "pending",
+  },
 });
 module.exports = mongoose.model("orders", Orders_schema);

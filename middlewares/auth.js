@@ -6,8 +6,6 @@ const User = require("../models/User");
 // Protect routes
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
-  console.log(req.headers);
-  console.log("We have cookie", req.cookies);
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
