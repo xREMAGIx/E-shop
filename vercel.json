@@ -1,0 +1,7 @@
+{
+  "name": "nextjs-e-shop-backend",
+  "version": 2,
+  "env": {
+    "MONGODB_URI": "@MONGO_URI"
+  }
+}
