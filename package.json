@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha 'controllers/test/*.js'",
-    "start": "NODE_ENV=production node server",
+    "build": "SET NODE_ENV=production & node server",
     "dev": "nodemon server"
   },
   "author": "",
