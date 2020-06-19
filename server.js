@@ -11,7 +11,6 @@ const session = require("express-session");
 var cors = require("cors");
 const dns = require("dns");
 const os = require("os");
-const Visitor = require("./models/Visitor");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
