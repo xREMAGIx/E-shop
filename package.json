@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha 'controllers/test/*.js'",
-    "start": "NODE_ENV=production & node server",
+    "start": "start NODE_ENV=production & node server",
     "dev": "nodemon server",
-    "now-build": "node ./build.js"
+    "now-build": "NODE_ENV=production & node server"
   },
   "author": "",
   "license": "ISC",
