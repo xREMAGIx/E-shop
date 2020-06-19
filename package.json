@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha 'controllers/test/*.js'",
-    "build": "NODE_ENV=production & node server",
-    "dev": "nodemon server"
+    "start": "NODE_ENV=production & node server",
+    "dev": "nodemon server",
+    "now-build": "node ./build.js"
   },
   "author": "",
   "license": "ISC",
@@ -24,7 +25,8 @@
     "mongoose": "^5.9.4",
     "morgan": "^1.9.1",
     "nodemailer": "^6.4.5",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "vercel": "^19.1.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
