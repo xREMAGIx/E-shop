@@ -26,6 +26,6 @@ router
 router
   .route("/:id")
   .put(protect, roleProtect("admin"), updateUser)
-  .get(protect, roleProtect("admin"), getUser)
+  .get(protect, getUser)
   .delete(protect, roleProtect("admin"), deleteUser);
 module.exports = router;
