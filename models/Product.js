@@ -29,11 +29,61 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    size: [
-      {
-        type: String,
-      },
-    ],
+    cpu: {
+      type: String,
+    },
+    gpu: {
+      type: String,
+    },
+    os: {
+      type: String,
+    },
+    ram: {
+      type: String,
+    },
+    storage: {
+      type: String,
+    },
+    newFeature: {
+      type: String,
+    },
+    display: {
+      type: String,
+    },
+    displayResolution: {
+      type: String,
+    },
+    displayScreen: {
+      type: String,
+    },
+    camera: {
+      type: String,
+    },
+    video: {
+      type: String,
+    },
+    wifi: {
+      type: String,
+    },
+    bluetooth: {
+      type: String,
+    },
+    ports: {
+      type: String,
+    },
+    size: {
+      type: String,
+    },
+    weight: {
+      type: String,
+    },
+    material: {
+      type: String,
+    },
+    batteryCapacity: {
+      type: String,
+    },
+
     description: String,
     createAt: {
       type: Date,

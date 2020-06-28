@@ -47,9 +47,6 @@ exports.getProduct = asyncHandler(async (req, res, next) => {
 // @route POST /api/products
 // @access  Private
 exports.createProduct = asyncHandler(async (req, res, next) => {
-  console.log(req.body);
-
-  console.log("COn cac");
   const product = await Product.create(req.body);
 
   res.status(200).json({ success: true, data: product });
@@ -182,7 +179,7 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
           404
         )
       );
-    console.log(3);
+    console.log(req.files.image);
     // Create custom filename
     const image = await Image.create({
       //    user: req.user.id,
