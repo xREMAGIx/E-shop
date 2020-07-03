@@ -5,6 +5,7 @@ const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
 const Filter = require("../utils/productsFilter");
 const fs = require("fs");
+const sharp = require("sharp");
 
 // @des Get all products
 // @route GET /api/products
@@ -153,7 +154,6 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Error`, 404));
   }
 
-  console.log(req.files);
   if (!req.files) {
     return next(new ErrorResponse(`Please upload a file`, 400));
   }
@@ -179,7 +179,7 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
           404
         )
       );
-    console.log(req.files.image);
+
     // Create custom filename
     const image = await Image.create({
       //    user: req.user.id,
@@ -190,17 +190,20 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
     image.path = files[i].name;
     await image.save();
 
-    files[i].mv(
-      `${process.env.FILE_UPLOAD_PATH}/${files[i].name}`,
-      async (err) => {
-        if (err) {
-          console.error(err);
-          // Delete Image
-          image.remove();
-          return next(new ErrorResponse(`Problem with file upload`, 404));
+    sharp(files[i].data)
+      .resize(1000)
+      .jpeg({ quality: 80 })
+      .toFile(
+        `${process.env.FILE_UPLOAD_PATH}/${files[i].name}`,
+        async (err) => {
+          if (err) {
+            console.error(err);
+            // Delete Image
+            image.remove();
+            return next(new ErrorResponse(`Problem with file upload`, 404));
+          }
         }
-      }
-    );
+      );
   }
   const updatedProduct = await Product.findById(req.params.id).populate(
     "images"

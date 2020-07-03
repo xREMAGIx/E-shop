@@ -3,6 +3,7 @@ const ErrorResponse = require("../utils/errorResponse");
 const Banner = require("../models/Banner");
 const BannerImage = require("../models/BannerImage");
 const path = require("path");
+const sharp = require("sharp");
 
 const fs = require("fs");
 
@@ -10,15 +11,12 @@ const fs = require("fs");
 // @route Get /api/banner/current
 // @access All
 exports.getCurrentBanner = asyncHandler(async (req, res, next) => {
-  console.log(1);
   let banner = await Banner.findOne();
 
-  console.log(2);
   if (!banner) {
     banner = await Banner.create({});
   }
 
-  console.log(3);
   return res.status(200).json({ success: true, data: banner });
 });
 
@@ -37,10 +35,6 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
   Array.isArray(req.files.image) == false
     ? images.push(req.files.image)
     : (images = [...req.files.image]);
-  console.log("-----------------------------------");
-  console.log(req.files.image);
-  console.log("-----------------------------------");
-  console.log(images);
 
   for (let i = 0; i < images.length; i++) {
     // Make sure the image is a photo
@@ -58,16 +52,24 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
       );
     let bannerImage = new BannerImage();
     bannerImage.path = `banner_${bannerImage._id}.jpg`;
-    images[i].mv(
-      `${process.env.FILE_UPLOAD_PATH}/${bannerImage.path}`,
-      async (err) => {
-        if (err) {
-          console.error(err);
-          // Delete Image
-          return next(new ErrorResponse(`Problem with file upload`, 404));
+
+    console.log(bannerImage);
+    console.log(images[i].data);
+
+    sharp(images[i].data)
+      .resize()
+      .jpeg({ quality: 80 })
+      .toFile(
+        `${process.env.FILE_UPLOAD_PATH}/${bannerImage.path}`,
+        async (err) => {
+          if (err) {
+            console.log("asdjkhakjd hAIU");
+            console.error(err);
+            // Delete Image
+            return next(new ErrorResponse(`Problem with file upload`, 404));
+          }
         }
-      }
-    );
+      );
 
     await bannerImage.save();
   }
@@ -130,7 +132,6 @@ exports.updateBanner = asyncHandler(async (req, res, next) => {
 // @access Admin
 
 exports.getBannerById = asyncHandler(async (req, res, next) => {
-  console.log(1);
   const banner = await BannerImage.findById(req.params.id);
 
   if (!banner) return next(new ErrorResponse("Banner not found", 404));
