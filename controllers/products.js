@@ -192,7 +192,7 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
 
     sharp(files[i].data)
       .resize(1000)
-      .jpeg({ quality: 80 })
+      .webp({ quality: 80 })
       .toFile(
         `${process.env.FILE_UPLOAD_PATH}/${files[i].name}`,
         async (err) => {

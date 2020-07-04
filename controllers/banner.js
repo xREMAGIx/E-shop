@@ -58,7 +58,7 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
 
     sharp(images[i].data)
       .resize()
-      .jpeg({ quality: 80 })
+      .webp({ quality: 80 })
       .toFile(
         `${process.env.FILE_UPLOAD_PATH}/${bannerImage.path}`,
         async (err) => {
