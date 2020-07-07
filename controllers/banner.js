@@ -51,7 +51,7 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
         )
       );
     let bannerImage = new BannerImage();
-    bannerImage.path = `banner_${bannerImage._id}.jpg`;
+    bannerImage.path = `banner_${bannerImage._id}.webp`;
 
     console.log(bannerImage);
     console.log(images[i].data);
@@ -63,7 +63,6 @@ exports.UploadBanner = asyncHandler(async (req, res, next) => {
         `${process.env.FILE_UPLOAD_PATH}/${bannerImage.path}`,
         async (err) => {
           if (err) {
-            console.log("asdjkhakjd hAIU");
             console.error(err);
             // Delete Image
             return next(new ErrorResponse(`Problem with file upload`, 404));

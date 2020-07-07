@@ -186,7 +186,7 @@ exports.productImageUpload = asyncHandler(async (req, res, next) => {
       product: req.params.id,
     });
 
-    files[i].name = `photo_${image._id}${path.parse(files[i].name).ext}`;
+    files[i].name = `photo_${image._id}.webp`;
     image.path = files[i].name;
     await image.save();
 
