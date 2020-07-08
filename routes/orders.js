@@ -6,6 +6,11 @@ const router = express.Router();
 
 router.get("/", protect, roleProtect("admin"), oders_ctr.getOders);
 router.get("/:id", protect, roleProtect("admin"), oders_ctr.getOder);
+
+router
+  .route("/:id")
+  .delete(protect, roleProtect("admin"), oders_ctr.deleteOrder);
+
 router.post("/createOrder", protect, oders_ctr.Create0der);
 
 router.route("/:id").post(protect, roleProtect("admin"), oders_ctr.updateOrder);

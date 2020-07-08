@@ -162,4 +162,20 @@ exports.updateOrder = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ success: true, data: order });
 });
 
+// @des Delete Order
+// @route Delete /api/order/:id
+// @access  Private
+exports.deleteOrder = asyncHandler(async (req, res, next) => {
+  const order = await Orders.findById(req.params.id);
+
+  if (order.user != req.user.id && req.user.role != "admin") {
+    return new ErrorResponse(`You can not access this route`, 403);
+  }
+  console.log("con cac");
+
+  await Orders.findByIdAndRemove(req.params.id);
+
+  return res.status(200).json({ success: true, data: [] });
+});
+
 module.exports.confirmOder = () => {};
