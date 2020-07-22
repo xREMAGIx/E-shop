@@ -111,6 +111,8 @@ ProductSchema.virtual("images", {
   justOne: false,
 });
 
+ProductSchema.index({ "$**": "text" });
+
 ProductSchema.pre("remove", async () => {
   const images = await Image.find({ product: this._id });
   // Remove Image

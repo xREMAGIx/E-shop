@@ -13,12 +13,15 @@ const {
 
 const { protect, roleProtect } = require("../middlewares/auth");
 const checkImage = require("../middlewares/file");
+const advancedResults = require("../middlewares/advancedResults");
+
+const Product = require("../models/Product");
 
 const router = express.Router();
 
 router
   .route("/")
-  .get(getProducts)
+  .get(advancedResults(Product, ""), getProducts)
   .post(protect, roleProtect("admin"), createProduct);
 // .post(createProduct);
 router.route("/:id").get(getProduct).put(updateProduct).delete(deleteProduct);

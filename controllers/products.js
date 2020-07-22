@@ -11,22 +11,8 @@ const sharp = require("sharp");
 // @route GET /api/products
 // @access  Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
-  const perPage = 10;
-  const page = parseInt(req.query.pages, 10) || 1;
-  const products = await Product.find().populate("images", "path");
-
-  let maxPage =
-    products.length % perPage == 0
-      ? Math.ceil(products.length / perPage)
-      : Math.floor(products.length / perPage) + 1;
-
-  let newProducts = products.slice((page - 1) * 10, page * perPage - 1);
-  res.status(200).json({
-    success: true,
-    data: newProducts,
-    page: page,
-    maxPage: maxPage,
-  });
+  console.log(res.advancedResults);
+  res.status(200).json(res.advancedResults);
 });
 
 // @des Get product
