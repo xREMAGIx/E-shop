@@ -23,7 +23,7 @@ router
   .route("/")
   .get(advancedResults(Product, ""), getProducts)
   .post(protect, roleProtect("admin"), createProduct);
-// .post(createProduct);
+
 router.route("/:id").get(getProduct).put(updateProduct).delete(deleteProduct);
 
 router

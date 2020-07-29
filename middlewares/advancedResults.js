@@ -31,7 +31,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
 
   // Query
   console.log(2);
-  query = model.find(JSON.parse(queryStr));
+  query = model.find(JSON.parse(queryStr)).populate("images", "path");
 
   // Select field
   if (req.query.select) {
