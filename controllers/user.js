@@ -116,14 +116,13 @@ exports.changeAvatar = asyncHandler(async (req, res, next) => {
 // @route Put /api/user/:id
 // @access  Admin
 exports.updateUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    // runValidators: true,
+  });
   if (!user) {
     return next(new ErrorResponse("User not found", 404));
   }
-  user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
   res.status(200).json({ success: true, data: user });
 });
 

@@ -78,8 +78,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
 
   let results = await query;
 
-  console.log(results);
-
   console.log(4);
 
   const pagination = {};

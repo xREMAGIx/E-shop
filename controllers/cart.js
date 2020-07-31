@@ -13,8 +13,8 @@ const createCart = async (user) => {
   if (!cart) cart = Cart.create({ user: user });
   return cart;
 };
+
 exports.viewCart = asyncHandler(async (req, res, next) => {
-  console.log("userID: ", req.user.id);
   let cart = req.session.cart;
 
   if (!cart) cart = await createCart(req.user);
@@ -70,16 +70,12 @@ exports.decreaseCart = asyncHandler(async (req, res, next) => {
   cart = JSON.parse(JSON.stringify(cart));
   const productId = req.params.productId;
 
-  console.log(cart);
-
   cart.products.map((product) => {
     if (product.product === productId && product.amount >= 1) {
       product.amount--;
       return;
     }
   });
-
-  console.log(cart.products);
 
   let products = cart.products;
 
@@ -161,9 +157,6 @@ exports.checkOutCart = asyncHandler(async (req, res, next) => {
     productIds.push(product.product);
     amount[product.product] = product.amount;
   });
-
-  console.log(productIds);
-  console.log(amount);
 
   const products = await Product.find({ _id: { $in: productIds } });
 

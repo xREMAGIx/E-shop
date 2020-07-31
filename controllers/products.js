@@ -11,7 +11,6 @@ const sharp = require("sharp");
 // @route GET /api/products
 // @access  Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
-  console.log(res.advancedResults);
   res.status(200).json(res.advancedResults);
 });
 
