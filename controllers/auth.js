@@ -86,6 +86,7 @@ exports.login = asyncHandler(async (req, res, next) => {
   // CHeck password
   const isMatch = await user.matchPassword(password);
 
+  console.log(5);
   if (!isMatch) return next(new ErrorResponse("Wrong password", 401));
 
   if (!user.isAuthentication) {
@@ -205,7 +206,7 @@ exports.activeAccount = asyncHandler(async (req, res, next) => {
   const message = `Click on the link below to acctive your account: \n\n ${activeUrl}`;
 
   try {
-    await sendEmail({ email: user.email, subject: "ACTIVE ACCOUNT", message });
+    //await sendEmail({ email: user.email, subject: "ACTIVE ACCOUNT", message });
 
     return res.status(200).json({ success: true, data: "Email sent" });
   } catch (error) {
@@ -229,9 +230,9 @@ const sendTokenResponse = (user, statusCode, res) => {
   };
 
   if (process.env.NODE_ENV === "production") {
-    options.secure = true;
+    options.secure = false;
   }
-  res
+  return res
     .status(statusCode)
     .cookie("token", token, options)
     .json({ success: true, token });
