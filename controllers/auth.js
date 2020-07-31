@@ -24,10 +24,12 @@ exports.register = asyncHandler(async (req, res, next) => {
     "host"
   )}/api/auth/confirm-email/${confirmToken}`;
 
+  console.log(confirmUrl);
+
   const message = `Click on the link below to confirm your email: \n\n ${confirmUrl}`;
 
   try {
-    await sendEmail({ email: user.email, subject: "CONFIRM EMAIL", message });
+    //await sendEmail({ email: user.email, subject: "CONFIRM EMAIL", message });
 
     return res.status(200).json({ success: true, data: "Email sent" });
   } catch (error) {
