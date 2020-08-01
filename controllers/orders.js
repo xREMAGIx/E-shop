@@ -1,6 +1,7 @@
 const Orders = require("../models/Orders");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
+const User = require("../models/User");
 const Promotion = require("../models/Promotions");
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/async");
@@ -53,9 +54,6 @@ module.exports.Create0der = async (req, res) => {
 
     console.log(cart);
     let x = cart.products;
-    console.log("------------------------------------------------------");
-    console.log(x);
-    console.log(typeof x);
 
     if (cart.products.length == 0) {
       console.log("fhijfhfifh");
@@ -130,11 +128,20 @@ module.exports.Create0der = async (req, res) => {
       console.log(2, cart.products);
       console.log(3, total);
       console.log(4, req.body);
+      await User.findByIdAndUpdate(
+        req.user.id,
+        { phone: req.body.phone, address: req.body.address },
+        {
+          new: true,
+          // runValidators: true,
+        }
+      );
       await Orders.create({
         user: req.user._id,
         products: cart.products,
         totalPrice: total,
         payment: req.body.payment,
+
         dateOrder: Date.now(),
       });
       await Cart.findOneAndUpdate({ user: req.user.id }, { products: [] });
