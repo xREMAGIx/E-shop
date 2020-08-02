@@ -94,6 +94,14 @@ const ProductSchema = new mongoose.Schema(
       default: 0,
     },
     content: String,
+    ratingAvg: {
+      type: Number,
+      default: 0,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+    }
   },
   {
     toJSON: {
