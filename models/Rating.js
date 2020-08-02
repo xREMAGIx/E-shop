@@ -12,9 +12,11 @@ const RatingSchema = new mongoose.Schema({
     required: true,
   },
   isAnonymous: { type: Boolean, default: false },
+  name: { type: String },
+  email: { type: String },
   content: { type: String },
   point: { type: Number, default: 5 },
   createdAt: { type: Date, require: true, default: Date.now },
 });
 
-module.exports = mongoose.model("ratings", RatingSchema);
+module.exports = mongoose.model("Rating", RatingSchema);

@@ -20,12 +20,30 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
 exports.getProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.id).populate(
     "images",
-    "path"
+    "path",
+  ).populate({
+    path: "ratings",
+    options: {
+      limit: 2,
+      sort: { point: -1, createdAt: -1 },
+    }
+  }
   );
 
   if (!product) {
     return next(new ErrorResponse(`Error`, 404));
   }
+
+  product.ratings = product.ratings.map(t => {
+    if (t.isAnonymous) {
+      t.name = undefined
+      t.email = undefined
+      t.user = undefined
+    }
+
+    return t
+  })
+
   res.status(200).json({ success: true, data: product });
 });
 

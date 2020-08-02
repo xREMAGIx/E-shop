@@ -120,6 +120,13 @@ ProductSchema.virtual("images", {
   justOne: false,
 });
 
+ProductSchema.virtual("ratings", {
+  ref: "Rating",
+  localField: "_id",
+  foreignField: "product",
+  justOne: false,
+});
+
 ProductSchema.index({ "$**": "text" });
 
 ProductSchema.pre("remove", async () => {

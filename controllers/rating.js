@@ -9,15 +9,20 @@ const mongoose = require("mongoose");
 // @access  Private
 exports.createRating = asyncHandler(async (req, res, next) => {
   // create rating
-  let { content, isAnomyous, point, productID } = req.body
+  let { content, isAnonymous, point, productID } = req.body
 
   const product = await Product.findById(productID)
+
+  // remove old rating
+  await Rating.deleteMany({ product, user: req.user })
 
   let rating = new Rating(
     {
       user: req.user,
+      name: req.user.name,
+      email: req.user.email,
       product,
-      isAnomyous,
+      isAnonymous,
       content,
       point,
     }
