@@ -57,7 +57,17 @@ exports.createRating = asyncHandler(async (req, res, next) => {
 // @route POST /api/ratings/:id/replies
 // @access  Private
 exports.createReply = asyncHandler(async (req, res, next) => {
-  const product = await Product.create(req.body);
+  const { id } = req.params
 
-  res.status(200).json({ success: true, data: product });
+  const { content } = req.body
+
+  let rating = await Rating.findById(id)
+  rating.replies.push({
+    user: req.user,
+    content
+  })
+
+  await rating.save()
+
+  res.status(200).json({ success: true, data: "ok" });
 });

@@ -9,6 +9,7 @@ const {
   productsFilter,
   deleteProductImages,
   deleteProductImage,
+  getRatings
 } = require("../controllers/products");
 
 const { protect, roleProtect } = require("../middlewares/auth");
@@ -25,7 +26,7 @@ router
   .post(protect, roleProtect("admin"), createProduct);
 
 router.route("/:id").get(getProduct).put(updateProduct).delete(deleteProduct);
-
+router.route("/:id/ratings").get(getRatings);
 router
   .route("/:id/image")
   .post(
