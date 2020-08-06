@@ -29,6 +29,7 @@ const promotion = require("./routes/promotion");
 const banner = require("./routes/banner");
 const categories = require("./routes/categories");
 const brands = require("./routes//brands");
+const rating = require("./routes/rating");
 
 const app = express();
 const server = require("http").Server(app);
@@ -75,6 +76,7 @@ app.use("/api/promotion", promotion);
 app.use("/api/banner", banner);
 app.use("/api/categories", categories);
 app.use("/api/brands", brands);
+app.use("/api/ratings", rating);
 
 app.use(errorHandler);
 

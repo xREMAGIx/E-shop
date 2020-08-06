@@ -94,6 +94,14 @@ const ProductSchema = new mongoose.Schema(
       default: 0,
     },
     content: String,
+    ratingAvg: {
+      type: Number,
+      default: 0,
+    },
+    ratingCount: {
+      type: Number,
+      default: 0,
+    }
   },
   {
     toJSON: {
@@ -107,6 +115,13 @@ const ProductSchema = new mongoose.Schema(
 
 ProductSchema.virtual("images", {
   ref: "Image",
+  localField: "_id",
+  foreignField: "product",
+  justOne: false,
+});
+
+ProductSchema.virtual("ratings", {
+  ref: "Rating",
   localField: "_id",
   foreignField: "product",
   justOne: false,
