@@ -3,16 +3,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   let query;
 
   // Create remove field
-  let removeFields = [
-    "select",
-    "sort",
-    "limit",
-    "page",
-    "checkInDate",
-    "checkOutDate",
-    "category",
-    "search",
-  ];
+  let removeFields = ["select", "sort", "limit", "page", "search"];
 
   // Copy req.query
   const reqQuery = { ...req.query };
@@ -23,11 +14,15 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   // Stringify req.query
   queryStr = JSON.stringify(reqQuery);
 
+  //127.0.0.1:8000/api/v1/posts?ratings[gt]=3
+
   // Change lte, gte, ... to $lte, $gte, ...
   queryStr = queryStr.replace(
     /\b(lt|lte|gt|gte|in)\b/g,
     (match) => `$${match}`
   );
+
+  console.log(1234434, queryStr);
 
   // Query
   console.log(2);
@@ -42,13 +37,13 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     const sortBy = req.query.sort.split(",").join(" ");
     query = query.sort(sortBy);
   } else {
-    query = query.sort("-createdAt");
+    query = query.sort("-createAt");
   }
 
   let checkForValidMongoDbID = new RegExp("^[0-9a-fA-F]{24}$");
 
   //Filter
-  if (req.query.category && checkForValidMongoDbID.test(req.query.category)) {
+  if (req.query.brand && checkForValidMongoDbID.test(req.query.category)) {
     query = query.find({ category: req.query.category });
   } else if (
     req.query.category &&

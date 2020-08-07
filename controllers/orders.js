@@ -28,9 +28,9 @@ module.exports.getOders = (req, res) => {
   }
 };
 
-module.exports.getOder = (req, res) => {
+module.exports.getOder = async (req, res) => {
   try {
-    Orders.findById(req.params.id, (err, order) => {
+    await Orders.findById(req.params.id, (err, order) => {
       if (order) {
         return res.json({
           message: "success",
@@ -44,6 +44,26 @@ module.exports.getOder = (req, res) => {
     });
   } catch (error) {
     return new ErrorResponse("", 404);
+  }
+};
+
+module.exports.getUserOrders = async (req, res) => {
+  try {
+    await Orders.find({ user: req.params.userId }, (err, orders) => {
+      if (orders) {
+        return res.json({
+          message: "success",
+          data: orders,
+        });
+      } else {
+        return res.json({
+          message: "orders is empty",
+          data: [],
+        });
+      }
+    });
+  } catch (error) {
+    res.sendStatus(404);
   }
 };
 
@@ -129,7 +149,7 @@ module.exports.Create0der = async (req, res) => {
       console.log(3, total);
       console.log(4, req.body);
       await User.findByIdAndUpdate(
-        req.user.id,
+        req.user._id,
         { phone: req.body.phone, address: req.body.address },
         {
           new: true,
@@ -141,7 +161,8 @@ module.exports.Create0der = async (req, res) => {
         products: cart.products,
         totalPrice: total,
         payment: req.body.payment,
-
+        phone: req.body.phone,
+        address: req.body.address,
         dateOrder: Date.now(),
       });
       await Cart.findOneAndUpdate({ user: req.user.id }, { products: [] });

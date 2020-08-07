@@ -8,7 +8,7 @@ const Reply = new mongoose.Schema({
   },
   content: { type: String },
   createdAt: { type: Date, require: true, default: Date.now },
-})
+});
 
 const RatingSchema = new mongoose.Schema({
   user: {
@@ -27,7 +27,7 @@ const RatingSchema = new mongoose.Schema({
   content: { type: String },
   point: { type: Number, default: 5 },
   createdAt: { type: Date, require: true, default: Date.now },
-  replies: [Reply]
+  replies: [Reply],
 });
 
 module.exports = mongoose.model("Rating", RatingSchema);

@@ -9,65 +9,67 @@ const mongoose = require("mongoose");
 // @access  Private
 exports.createRating = asyncHandler(async (req, res, next) => {
   // create rating
-  let { content, isAnonymous, point, productID } = req.body
+  let { content, isAnonymous, point, productID } = req.body;
 
-  const product = await Product.findById(productID)
+  console.log(1);
+
+  const product = await Product.findById(productID);
 
   // remove old rating
-  await Rating.deleteMany({ product, user: req.user })
+  await Rating.deleteMany({ product, user: req.user });
 
-  let rating = new Rating(
-    {
-      user: req.user,
-      name: req.user.name,
-      email: req.user.email,
-      product,
-      isAnonymous,
-      content,
-      point,
-    }
-  )
+  let rating = new Rating({
+    user: req.user,
+    name: req.user.name,
+    email: req.user.email,
+    product,
+    isAnonymous,
+    content,
+    point,
+  });
 
-  await rating.save()
+  await rating.save();
 
   // if rating create success, update rating product
   const results = await Rating.aggregate([
     {
-      $match: { product: product._id }
+      $match: { product: product._id },
     },
-    { "$unwind": "$product" },
+    { $unwind: "$product" },
     {
-      "$group": {
-        "_id": "$product",
-        "ratingAvg": { "$avg": "$point" },
-        "ratingCount": { "$sum": 1 }
-      }
-    }
-  ])
+      $group: {
+        _id: "$product",
+        ratingAvg: { $avg: "$point" },
+        ratingCount: { $sum: 1 },
+      },
+    },
+  ]);
 
-  const result = results[0]
-
-  await Product.findOneAndUpdate({ _id: productID }, { ratingAvg: result.ratingAvg, ratingCount: result.ratingCount }, { new: true })
+  const result = results[0];
+  await Product.findOneAndUpdate(
+    { _id: productID },
+    { ratingAvg: result.ratingAvg, ratingCount: result.ratingCount },
+    { new: true }
+  );
 
   res.status(200).json({ success: true, data: rating });
 });
-
 
 // @des Create new product
 // @route POST /api/ratings/:id/replies
 // @access  Private
 exports.createReply = asyncHandler(async (req, res, next) => {
-  const { id } = req.params
+  const { id } = req.params;
 
-  const { content } = req.body
+  const { content } = req.body;
 
-  let rating = await Rating.findById(id)
+  let rating = await Rating.findById(id);
   rating.replies.push({
     user: req.user,
-    content
-  })
+    content,
+  });
 
-  await rating.save()
+  await rating.save();
 
   res.status(200).json({ success: true, data: "ok" });
 });
